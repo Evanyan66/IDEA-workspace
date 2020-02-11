@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+
+  <!--<bean id="User" class="main.java.com.cyy.pojo.User" >
+	  <property name="username" value="Evanyan" ></property>
+  </bean>-->
+
+
+	<bean id="UserImpl" class="main.java.com.cyy.service.UserImpl">
+		<property name="userName" value="Evanyan"></property>
+	</bean>
+
+	<bean id="print" class="main.java.com.cyy.pojo.UserService" p:userDao-ref="UserImpl">
+       <!--<property name="userDao" ref="UserImpl"></property>-->
+		<!--<constructor-arg>
+			<ref bean="UserImpl"/>
+		</constructor-arg>-->
+	</bean>
+
+	<!--声明增强方法所在的bean-->
+    <bean id="AopService" class="main.java.com.cyy.aop.AopService"/>
+
+
+	<!--配置切面-->
+	<aop:config>
+		<!--定义切入点-->
+		<aop:pointcut id="pointcut" expression="execution(public void print())"/>
+		<!--引用包含增强方法的Bean-->
+		<aop:aspect ref="AopService">
+			<!--将before()方法定义为前置增强并引用pointcut切入点-->
+			<aop:before method="before" pointcut-ref="pointcut"/>
+			<!--将rear()方法定义为后置增强并引用pointcut-->
+			<!--通过returning属性指定为result的参数注入返回值-->
+			<aop:after-returning method="rear" pointcut-ref="pointcut" returning="result" />
+			<!--异常增强-->
+            <aop:after-throwing method="abnormalEnhancement" pointcut-ref="pointcut" throwing="e"/>
+            <!--最终增强-->
+			<aop:before method="finalEnhancement" pointcut-ref="pointcut"/>
+			<!--环绕增强-->
+			<aop:around method="surroundEnhancement" pointcut-ref="pointcut"/>
+		</aop:aspect>
+	</aop:config>
+
+</beans>
